@@ -44,7 +44,7 @@
 (setq mu4e-org-link-query-in-headers-mode nil)
 
 
-; smtp
+                                        ; smtp
 (setq message-send-mail-function 'smtpmail-send-it
       smtpmail-starttls-credentials
       '(("smtp.gmail.com" 587 nil nil))
@@ -60,7 +60,7 @@
 (setq mu4e-trash-folder  "/Trash")
 (setq message-signature-file "~/.emacs.d/.signature") ; put your signature in this file
 
-; get mail
+                                        ; get mail
 (setq mu4e-get-mail-command "mbsync -c ~/.doom.d.jethrokuan/.mbsyncrc gmail"
       mu4e-html2text-command "w3m -T text/html"
       mu4e-update-interval 120
@@ -83,18 +83,18 @@
 ;; general emacs mail settings; used when composing e-mail
 ;; the non-mu4e-* stuff is inherited from emacs/message-mode
 (setq mu4e-compose-reply-to-address "guoweis@gmail.com"
-    user-mail-address "guoweis@gmail.com"
-    user-full-name  "Guowei Shieh")
+      user-mail-address "guoweis@gmail.com"
+      user-full-name  "Guowei Shieh")
 
 ;; don't save message to Sent Messages, IMAP takes care of this
-; (setq mu4e-sent-messages-behavior 'delete)
+                                        ; (setq mu4e-sent-messages-behavior 'delete)
 
 ;; spell check
 (add-hook 'mu4e-compose-mode-hook
-        (defun my-do-compose-stuff ()
-           "My settings for message composition."
-           (set-fill-column 72)
-           (flyspell-mode)))
+          (defun my-do-compose-stuff ()
+            "My settings for message composition."
+            (set-fill-column 72)
+            (flyspell-mode)))
 ;;;;;;;
 ;;;;;;;
 
@@ -127,11 +127,11 @@
   (add-hook 'find-file-hook #'jethro/enable-smerge-maybe :append)
   :config
   (defhydra jethro/hydra-smerge (:color pink
-                                        :hint nil
-                                        :pre (smerge-mode 1)
-                                        ;; Disable `smerge-mode' when quitting hydra if
-                                        ;; no merge conflicts remain.
-                                        :post (smerge-auto-leave))
+                                 :hint nil
+                                 :pre (smerge-mode 1)
+                                 ;; Disable `smerge-mode' when quitting hydra if
+                                 ;; no merge conflicts remain.
+                                 :post (smerge-auto-leave))
     "
    ^Move^       ^Keep^               ^Diff^                 ^Other^
    ^^-----------^^-------------------^^---------------------^^-------
@@ -169,7 +169,7 @@
   (transient-append-suffix 'magit-log "a"
     '("w" "Wip" magit-wip-log-current))
   (magit-define-popup-switch 'magit-log-popup
-                             ?m "Omit merge commits" "--no-merges")
+    ?m "Omit merge commits" "--no-merges")
   (transient-append-suffix 'magit-log "-A"
     '("-m" "Omit merge commits" "--no-merges")))
 
@@ -201,11 +201,11 @@
 
 (after! org
   (use-package! ol-notmuch
-  :init
-  (map! :map notmuch-show-mode-map "C" #'jethro/org-capture-email)
-  (defun jethro/org-capture-email ()
-    (interactive)
-    (org-capture nil "e")))
+    :init
+    (map! :map notmuch-show-mode-map "C" #'jethro/org-capture-email)
+    (defun jethro/org-capture-email ()
+      (interactive)
+      (org-capture nil "e")))
   (require 'org-habit)
 
   (with-eval-after-load 'flycheck
@@ -444,10 +444,10 @@ only headings."
 
 (use-package! org-clock-convenience
   :bind (:map org-agenda-mode-map
-              ("<S-up>" . org-clock-convenience-timestamp-up)
-              ("<S-down>" . org-clock-convenience-timestamp-down)
-              ("o" . org-clock-convenience-fill-gap)
-              ("e" . org-clock-convenience-fill-gap-both)))
+         ("<S-up>" . org-clock-convenience-timestamp-up)
+         ("<S-down>" . org-clock-convenience-timestamp-down)
+         ("o" . org-clock-convenience-fill-gap)
+         ("e" . org-clock-convenience-fill-gap-both)))
 
 (use-package! org-agenda
   :init
@@ -459,33 +459,33 @@ only headings."
     (org-agenda nil " "))
   :config
   (defun jethro/is-project-p ()
-  "Any task with a todo keyword subtask"
-  (save-restriction
-    (widen)
-    (let ((has-subtask)
-          (subtree-end (save-excursion (org-end-of-subtree t)))
-          (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
-      (save-excursion
-        (forward-line 1)
-        (while (and (not has-subtask)
-                    (< (point) subtree-end)
-                    (re-search-forward "^\*+ " subtree-end t))
-          (when (member (org-get-todo-state) org-todo-keywords-1)
-            (setq has-subtask t))))
-      (and is-a-task has-subtask))))
+    "Any task with a todo keyword subtask"
+    (save-restriction
+      (widen)
+      (let ((has-subtask)
+            (subtree-end (save-excursion (org-end-of-subtree t)))
+            (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
+        (save-excursion
+          (forward-line 1)
+          (while (and (not has-subtask)
+                      (< (point) subtree-end)
+                      (re-search-forward "^\*+ " subtree-end t))
+            (when (member (org-get-todo-state) org-todo-keywords-1)
+              (setq has-subtask t))))
+        (and is-a-task has-subtask))))
 
   (defun jethro/skip-projects ()
-  "Skip trees that are projects"
-  (save-restriction
-    (widen)
-    (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-      (cond
-       ((org-is-habit-p)
-        next-headline)
-       ((jethro/is-project-p)
-        next-headline)
-       (t
-        nil)))))
+    "Skip trees that are projects"
+    (save-restriction
+      (widen)
+      (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+        (cond
+         ((org-is-habit-p)
+          next-headline)
+         ((jethro/is-project-p)
+          next-headline)
+         (t
+          nil)))))
 
   (setq org-columns-default-format "%40ITEM(Task) %Effort(EE){:} %CLOCKSUM(Time Spent) %SCHEDULED(Scheduled) %DEADLINE(Deadline)")
   (setq org-agenda-custom-commands `((" " "Agenda"
@@ -556,11 +556,11 @@ only headings."
            :unnarrowed t)))
   (setq org-roam-dailies-directory "daily/")
   (setq org-roam-dailies-capture-templates
-      '(("d" "default" entry
-         #'org-roam-capture--get-point
-         "* %?"
-         :file-name "daily/%<%Y-%m-%d>"
-         :head "#+title: %<%Y-%m-%d>\n\n")))
+        '(("d" "default" entry
+           #'org-roam-capture--get-point
+           "* %?"
+           :file-name "daily/%<%Y-%m-%d>"
+           :head "#+title: %<%Y-%m-%d>\n\n")))
   (set-company-backend! 'org-mode '(company-capf)))
 
 (after! org-ref
@@ -667,7 +667,7 @@ only headings."
   :hook (org-roam-mode . org-roam-bibtex-mode)
   :config
   (setq org-roam-bibtex-preformat-keywords
-   '("=key=" "title" "url" "file" "author-or-editor" "keywords"))
+        '("=key=" "title" "url" "file" "author-or-editor" "keywords"))
   (setq orb-templates
         `(("r" "ref" plain (function org-roam-capture--get-point)
            ""
@@ -692,21 +692,21 @@ only headings."
         bibtex-completion-bibliography "~/.org/braindump/org/biblio.bib"
         bibtex-completion-pdf-field "file"
         bibtex-completion-notes-template-multiple-files
-         (concat
-          "#+title: ${title}\n"
-          "#+roam_key: cite:${=key=}\n"
-          "* TODO Notes\n"
-          ":PROPERTIES:\n"
-          ":Custom_ID: ${=key=}\n"
-          ":NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n"
-          ":AUTHOR: ${author-abbrev}\n"
-          ":JOURNAL: ${journaltitle}\n"
-          ":DATE: ${date}\n"
-          ":YEAR: ${year}\n"
-          ":DOI: ${doi}\n"
-          ":URL: ${url}\n"
-          ":END:\n\n"
-          )))
+        (concat
+         "#+title: ${title}\n"
+         "#+roam_key: cite:${=key=}\n"
+         "* TODO Notes\n"
+         ":PROPERTIES:\n"
+         ":Custom_ID: ${=key=}\n"
+         ":NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n"
+         ":AUTHOR: ${author-abbrev}\n"
+         ":JOURNAL: ${journaltitle}\n"
+         ":DATE: ${date}\n"
+         ":YEAR: ${year}\n"
+         ":DOI: ${doi}\n"
+         ":URL: ${url}\n"
+         ":END:\n\n"
+         )))
 
 (use-package! nov
   :hook (nov-mode . variable-pitch-mode)
@@ -834,10 +834,10 @@ With a prefix ARG always prompt for command to use."
       auth-source-cache-expiry nil) ; default is 7200 (2h)
 
 (setq org-jira-custom-jqls
-  '(
-    (:jql " project = VI AND (issuetype = Bug AND labels in (Server) AND status not in (Done, Duplicate, 'Won\\'t Fix' )) ORDER BY Priority DESC "
-          :filename "server-bugs")
-    ))
+      '(
+        (:jql " project = VI AND (issuetype = Bug AND labels in (Server) AND status not in (Done, Duplicate, 'Won\\'t Fix' )) ORDER BY Priority DESC "
+         :filename "server-bugs")
+        ))
 
 
 ;; (defconst jiralib-token
