@@ -49,7 +49,7 @@
        zen               ; distraction-free coding or writing
 
        :editor
-       ;; (evil +everywhere); come to the dark side, we have cookies
+       (evil +everywhere); come to the dark side, we have cookies
        ;; file-templates    ; auto-snippets for empty files
        fold              ; (nigh) universal code folding
        (format +onsave)  ; automated prettiness
@@ -72,7 +72,7 @@
        ;;eshell            ; a consistent, cross-platform shell (WIP)
        ;;shell             ; a terminal REPL for Emacs
        ;;term              ; terminals in Emacs
-       ;; vterm            ; another terminals in Emacs
+       vterm            ; another terminals in Emacs
 
        :checkers
        (syntax +childframe) ; tasing you for every semicolon you forget
@@ -90,10 +90,10 @@
        ;;gist              ; interacting with github gists
        (lookup +docsets +dictionary)   ; navigate your code and its documentation
        (lsp +peek)
-       ;;macos             ; MacOS-specific commands
+       macos             ; MacOS-specific commands
        (magit +forge)      ; a git porcelain for Emacs
        ;;make              ; run make tasks from Emacs
-       ;; pass             ; password manager for nerds
+       pass             ; password manager for nerds
        pdf               ; pdf enhancements
        ;;prodigy           ; FIXME managing external services & code builders
        ;;rgb               ; creating color strings
@@ -104,7 +104,7 @@
        :lang
        ;;agda              ; types of types of types of types...
        ;;assembly          ; assembly for fun or debugging
-       ;;cc                ; C/C++/Obj-C madness
+       cc                ; C/C++/Obj-C madness
        ;;clojure           ; java with a lisp
        ;;common-lisp       ; if you've seen one lisp, you've seen them all
        ;;coq               ; proofs-as-programs
@@ -119,7 +119,7 @@
        ;;faust             ; dsp, but you get to keep your soul
        ;;fsharp           ; ML stands for Microsoft's Language
        ;;fstar             ; (dependent) types and (monadic) effects and Z3
-       ;;go                ; the hipster dialect
+       (go +lsp)               ; the hipster dialect
        ;;(haskell +dante)  ; a language that's lazier than I am
        ;;hy                ; readability of scheme w/ speed of python
        ;;idris             ;
@@ -139,8 +139,8 @@
        (org              ; organize your plain life in plain text
         ;; +dragndrop ; drag & drop files/images into org buffersq
         +noter
-        ;; +journal
-        ;; +hugo          ; use Emacs for hugo blogging
+        +journal
+        +hugo          ; use Emacs for hugo blogging
         ;;+jupyter        ; ipython/jupyter support for babel
         ;;+pandoc          ; export-with-pandoc support
         ;;+pomodoro        ; be fruitful with the tomato technique
@@ -166,8 +166,8 @@
        ;;web               ; the tubes
 
        :email
-       ;;(mu4e +gmail)
-       notmuch
+       (mu4e +gmail)
+       ;;notmuch
        ;;(wanderlust +gmail)
 
        :app

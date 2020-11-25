@@ -6,7 +6,7 @@
       doom-font (font-spec :family "Iosevka" :size 16)
       doom-variable-pitch-font (font-spec :family "Libre Baskerville")
       doom-serif-font (font-spec :family "Libre Baskerville")
-      doom-theme 'modus-operandi
+      doom-theme 'doom-gruvbox
       display-line-numbers-type nil
       load-prefer-newer t
 
@@ -34,64 +34,69 @@
 
 (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
 
-(use-package! notmuch
-  :commands (notmuch)
-  :init
-  (map! :desc "notmuch" "<f2>" #'notmuch)
-  (map! :map notmuch-search-mode-map
-        :desc "toggle read" "t" #'+notmuch/toggle-read
-        :desc "Reply to thread" "r" #'notmuch-search-reply-to-thread
-        :desc "Reply to thread sender" "R" #'notmuch-search-reply-to-thread-sender
-        :desc "Filter" "/" #'notmuch-search-filter
-        :desc "Archive All" "A" #'+notmuch-archive-all
-        :desc "Delete All" "D" #'+notmuch-delete-all)
-  (map! :map notmuch-show-mode-map
-        :desc "Next link" "<tab>" #'org-next-link
-        :desc "Previous link" "<backtab>" #'org-previous-link
-        :desc "URL at point" "C-<return>" #'browse-url-at-point)
-  (defun +notmuch/toggle-read ()
-    "toggle read status of message"
-    (interactive)
-    (if (member "unread" (notmuch-search-get-tags))
-        (notmuch-search-tag (list "-unread"))
-      (notmuch-search-tag (list "+unread"))))
-  :config
-  (setq message-auto-save-directory "~/.mail/drafts/"
-        message-send-mail-function 'message-send-mail-with-sendmail
-        sendmail-program (executable-find "msmtp")
-        message-sendmail-envelope-from 'header
-        mail-envelope-from 'header
-        mail-specify-envelope-from t
-        message-sendmail-f-is-evil nil
-        message-kill-buffer-on-exit t
-        notmuch-always-prompt-for-sender t
-        notmuch-archive-tags '("-unread")
-        notmuch-crypto-process-mime t
-        notmuch-hello-sections '(notmuch-hello-insert-saved-searches)
-        notmuch-labeler-hide-known-labels t
-        notmuch-search-oldest-first nil
-        notmuch-archive-tags '("-inbox" "-unread")
-        notmuch-message-headers '("To" "Cc" "Subject" "Bcc")
-        notmuch-saved-searches '((:name "inbox" :query "tag:inbox")
-                                 (:name "unread" :query "tag:inbox and tag:unread")
-                                 (:name "to-me" :query "tag:inbox and tag:to-me")
-                                 (:name "personal" :query "tag:inbox and tag:personal")
-                                 (:name "org-roam" :query "tag:inbox and tag:roam")
-                                 (:name "nus" :query "tag:inbox and tag:nus")
-                                 (:name "drafts" :query "tag:draft")))
+;;; MU4E
+;; (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu/mu4e")
+(require 'mu4e)
+(require 'org-mu4e)
+(require 'smtpmail)
 
-  (defun +notmuch-archive-all ()
-    "Archive all the emails in the current view."
-    (interactive)
-    (notmuch-search-archive-thread nil (point-min) (point-max)))
+;;store link to message if in header view, not to header query
+(setq mu4e-org-link-query-in-headers-mode nil)
 
 
-  (defun +notmuch-delete-all ()
-    "Archive all the emails in the current view.
-Mark them for deletion by cron job."
-    (interactive)
-    (notmuch-search-tag-all '("+deleted"))
-    (+notmuch-archive-all)))
+; smtp
+(setq message-send-mail-function 'smtpmail-send-it
+      smtpmail-starttls-credentials
+      '(("smtp.gmail.com" 587 nil nil))
+      smtpmail-default-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-service 587
+      smtpmail-debug-info t)
+
+(setq mu4e-root-maildir (expand-file-name "~/.mail/gmail"))
+
+(setq mu4e-drafts-folder "/Drafts")
+(setq mu4e-sent-folder   "/Sent Items")
+(setq mu4e-trash-folder  "/Trash")
+(setq message-signature-file "~/.emacs.d/.signature") ; put your signature in this file
+
+; get mail
+(setq mu4e-get-mail-command "mbsync -c ~/.doom.d.jethrokuan/.mbsyncrc gmail"
+      mu4e-html2text-command "w3m -T text/html"
+      mu4e-update-interval 120
+      mu4e-headers-auto-update t
+      mu4e-compose-signature-auto-include nil)
+
+(setq mu4e-maildir-shortcuts
+      '( ("/INBOX"               . ?i)
+         ("/Sent Items"   . ?s)
+         ("/Trash"       . ?t)
+         ("/Drafts"    . ?d)))
+
+;; show images
+(setq mu4e-view-show-images t)
+
+;; use imagemagick, if available
+(when (fboundp 'imagemagick-register-types)
+  (imagemagick-register-types))
+
+;; general emacs mail settings; used when composing e-mail
+;; the non-mu4e-* stuff is inherited from emacs/message-mode
+(setq mu4e-compose-reply-to-address "guoweis@gmail.com"
+    user-mail-address "guoweis@gmail.com"
+    user-full-name  "Guowei Shieh")
+
+;; don't save message to Sent Messages, IMAP takes care of this
+; (setq mu4e-sent-messages-behavior 'delete)
+
+;; spell check
+(add-hook 'mu4e-compose-mode-hook
+        (defun my-do-compose-stuff ()
+           "My settings for message composition."
+           (set-fill-column 72)
+           (flyspell-mode)))
+;;;;;;;
+;;;;;;;
 
 (after! dired
   (setq dired-listing-switches "-aBhl  --group-directories-first"
@@ -303,23 +308,30 @@ only headings."
     (set-marker m nil)))
 
 (setq org-capture-templates
-        `(("i" "Inbox" entry (file "~/.org/gtd/inbox.org")
-           ,(concat "* TODO %?\n"
-                    "/Entered on/ %u"))
-          ("e" "Inbox [mail]" entry (file "~/.org/gtd/inbox.org")
-           ,(concat "* TODO Process: \"%a\" %?\n"
-                    "/Entered on/ %u"))
-          ("c" "org-protocol-capture" entry (file "~./.org/gtd/inbox.org")
-           "* TODO [[%:link][%:description]]\n\n %i"
-           :immediate-finish t)
-          ("m" "Metacognition")
-          ("mq" "Questions" entry (function ,(lambda ()
-                                               (jethro/olp-current-buffer "Metacog" "Questions")))
-           ,(concat "* TODO Q: %?\n"
-                    "/Entered on/ %u"))
-          ("mn" "Notes" entry (function ,(lambda ()
-                                           (jethro/olp-current-buffer "Metacog" "Notes")))
-           "* %?\n")))
+      `(("i" "Inbox" entry (file "~/.org/gtd/inbox.org")
+         ,(concat "* TODO %?\n"
+                  "/Entered on/ %u"))
+        ("!" "Quick Capture" entry (file+headline "~/.org/gtd/inbox.org" "Inbox")
+         "* TODO %(read-string \"Task: \")\n:PROPERTIES:\n:CREATED: %U\n:END:")
+        ("j" "Journal Entry" entry (file+olp+datetree "~/.org/gtd/journal.org")
+         "* %^{title}\n:PROPERTIES:\n:CREATED: %T\n:END:\n%?")
+        ("n" "New Note" entry (file "~/.org/gtd/notes.org")
+         "* %^{title} :NOTE:\n:PROPERTIES:\n:CREATED: %U\n:END:\n%?")
+        ("e" "Inbox [mail]" entry (file "~/.org/gtd/inbox.org")
+         ,(concat "* TODO Process: \"%a\" %?\n"
+                  "/Entered on/ %u"))
+        ("c" "org-protocol-capture" entry (file "~/.org/gtd/inbox.org")
+         "* TODO [[%:link][%:description]]\n\n %i"
+         :immediate-finish t)
+        ("m" "Metacognition")
+        ("mq" "Questions" entry (function ,(lambda ()
+                                             (jethro/olp-current-buffer "Metacog" "Questions")))
+         ,(concat "* TODO Q: %?\n"
+                  "/Entered on/ %u"))
+        ("mn" "Notes" entry (function ,(lambda ()
+                                         (jethro/olp-current-buffer "Metacog" "Notes")))
+         "* %?\n")))
+
 
 (setq org-todo-keywords
       '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
@@ -813,3 +825,20 @@ With a prefix ARG always prompt for command to use."
      (eval jethro/conditional-hugo-enable)
      (org-src-preserve-indentation)
      (eval require 'ol-info))))
+
+;; JIRA
+;;(make-directory "~/.org-jira")
+(setq jiralib-url "https://outreach-io.atlassian.net")
+
+(setq auth-sources '("~/.authinfo.gpg")
+      auth-source-cache-expiry nil) ; default is 7200 (2h)
+
+(setq org-jira-custom-jqls
+  '(
+    (:jql " project = VI AND (issuetype = Bug AND labels in (Server) AND status not in (Done, Duplicate, 'Won\\'t Fix' )) ORDER BY Priority DESC "
+          :filename "server-bugs")
+    ))
+
+
+;; (defconst jiralib-token
+;;   '("Cookie" . "cloud.session.token=<>"))

@@ -1,10 +1,11 @@
 # Gmail
 IMAPAccount gmail
 Host imap.gmail.com
-User jethrokuan95@gmail.com
-PassCmd "pass mbsync/jethrokuan95@gmail.com"
+User guoweis@gmail.com
+PassCmd "pass mbsync/guoweis@gmail.com"
 SSLType IMAPS
-CertificateFile /etc/ssl/certs/ca-certificates.crt
+CertificateFile /usr/local/etc/openssl/cert.pem
+AuthMechs LOGIN
 
 IMAPStore gmail-remote
 Account gmail
@@ -17,7 +18,7 @@ SubFolders Legacy
 Channel gmail
 Master :gmail-remote:
 Slave :gmail-local:
-Patterns "[Gmail]/Sent Mail" "[Gmail]/All Mail"
+Patterns "INBOX"
 Create Both
 SyncState *
 Sync All

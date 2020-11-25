@@ -1,10 +1,10 @@
 [database]
-path=/home/jethro/.mail/
+path=/Users/guoweishieh/.mail/
 
 [user]
-name=Jethro Kuan
-primary_email=jethrokuan95@gmail.com
-other_email=jethro@nushackers.org;e0036913@u.nus.edu
+name=Guowei Shieh
+primary_email=guoweis@gmail.com
+#other_email=jethro@nushackers.org;e0036913@u.nus.edu
 
 [new]
 tags=inbox;

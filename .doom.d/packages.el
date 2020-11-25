@@ -32,3 +32,6 @@
 (package! buttercup)
 (package! citeproc-org)
 (package! org-gcal)
+(package! ssh)
+(package! org-jira)
+(package! restclient)
